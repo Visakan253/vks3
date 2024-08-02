@@ -1,0 +1,229 @@
+import os
+import csv
+import datetime
+
+# Function for the title
+def title():
+    line_1 = "_______"
+    title_text = "Contacts Management System"
+    line_2 = "_______"
+
+    print(line_1.center(130))  # Center align the text
+    print(title_text.center(130))
+    print(line_2.center(130))
+
+# Create a class
+class contact_functions:
+    contact_fields = ["Name", "Mobile_No"]  # Column Names
+    contact_database = "contacts.csv"
+    contact_data = []  # Temporary list to store contact data
+
+    def create(self):
+        os.system('cls')
+        title()
+        print(" Create Contact: ".center(130))
+        print(" --".center(130))
+        print("")
+
+        # Get input from the user
+        for field in self.contact_fields:
+            contact_details = input(" Enter " + field + ": ")
+            print("")
+            self.contact_data.append(contact_details)
+
+        # Get date from the system
+        Date = datetime.datetime.today()
+        d = Date.strftime("%B %d %Y")  # Format the date
+        self.contact_data.append(d)
+
+        # Insert inputs into the CSV file
+        with open(self.contact_database, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(self.contact_data)
+
+        self.contact_data = []  # Clear the contact_data list for new input next time
+        
+        print("")
+        print("Contact is created successfully".center(129))
+        print("\n")
+
+    def view(self):
+        os.system('cls')
+        title()
+
+        print("Contacts:".center(130))
+        print("-----".center(130))
+        print("")
+
+        count = 0
+        # Open the CSV file to read the data
+        with open(self.contact_database, 'r') as file:
+            read = csv.reader(file)
+            for data1 in read:
+                if len(data1) > 0:
+                    count += 1
+    
+            print("Total Contacts: ", count)
+            print('')
+
+            # Check if the file is empty
+            if os.path.getsize(self.contact_database) == 0:
+                print("Contact book is empty, Please create contacts".center(129))
+            else:
+                # Display all data
+                file.seek(0)  # Reset the file pointer to the start
+                read = csv.reader(file)
+                
+                # Print headers
+                print('{:<20}{:<20}{:<20}'.format("Name", "Mobile_No", "Date"))
+                print("")
+
+                for data in read:
+                    print('{:<20}{:<20}{:<20}'.format(data[0], data[1], data[2]))
+                    print("")  
+
+        print("\n")
+
+        input("\t Press enter key to continue..".center(120))
+        os.system('cls')
+
+    def search(self):
+        os.system('cls')  
+        title()  
+
+        print("Search Contacts: ".center(130)) 
+        print("................".center(130))
+        print("")
+
+        self.contact_match = False
+        search_value = input("Enter your name: ").strip()
+        print("")
+
+        # Display field names
+        with open(self.contact_database, 'r') as file:
+            reader = csv.reader(file)
+            file.seek(0)  # Reset the file pointer to the start
+
+            # Print headers
+            print('{:<20}{:<20}{:<20}'.format("Name", "Mobile_No", "Date"))
+            print("")
+
+            # Read the database
+            for data in reader:
+                if len(data) > 0:
+                    if search_value.lower() in data[0].lower():
+                        self.contact_match = True
+                        print('{:<20}{:<20}{:<20}'.format(data[0], data[1], data[2]))
+                        print("")
+
+        if not self.contact_match:
+            print("")
+            print("Sorry!, there are no contacts by this name".center(130))
+            print("")
+
+        input("\t Press enter key to continue..".center(120))
+        os.system('cls')
+
+    def delete(self):
+        os.system('cls')  
+        title()  
+
+        print("Delete Contacts: ".center(130)) 
+        print("................".center(130))
+        print("")
+
+        self.contact_match = False
+        delete_value = input("Enter your name: ").strip()
+        update_list = []  # Empty list
+
+        # Read file to get the match of the search
+        with open(self.contact_database, 'r') as file:
+            reader = csv.reader(file)
+
+            for data in reader:
+                if len(data) > 0:
+                    if delete_value.lower() != data[0].lower():
+                        update_list.append(data)
+                    else:
+                        self.contact_match = True
+
+        # Conditions to delete matched contacts
+        if self.contact_match:
+            with open(self.contact_database, 'w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(update_list)
+
+            print("")
+            print("Contact is deleted successfully!".center(129))
+            print("")
+        else:
+            print("")
+            print("Sorry! Data not found".center(129))
+            print("")
+
+        input("\t Press enter key to continue..".center(120))
+        os.system('cls')
+
+# Main loop
+os.system('cls')
+title()
+
+contact_class = contact_functions()  # Instantiate the contact_functions class
+
+while True:
+    # Here, we are using a while loop for repetition.
+    print("1. View Contacts".center(128))
+    print("2. Create Contacts".center(129))
+    print("3. Search Contacts".center(129))
+    print("4. Delete Contacts".center(129))
+    print("5. Exit".center(120))
+    print(" ".center(131))
+    
+    option = int(input("\t\t\t\t\t\t\tChoose your option: ").strip())
+    
+    if option == 1:
+        contact_class.view()
+    
+    elif option == 2:
+        while True:
+            contact_class.create()
+            ans = input("\t\t\t\t\tDo you want to create another contact? [Y/N]: ").strip().lower()
+            if ans == 'y':
+                continue
+            else:
+                break
+        os.system('cls')
+        title()
+    
+    elif option == 3:
+        while True:
+            contact_class.search()
+            ans = input("\t\t\t\t\tDo you want to search for another contact? [Y/N]: ").strip().upper()
+            if ans == 'Y':
+                continue
+            else:
+                break
+        os.system('cls')
+        title()
+
+    elif option == 4:
+        while True:
+            contact_class.delete()
+            ans = input("\t\t\t\t\tDo you want to delete another contact? [Y/N]: ").strip().upper()
+            if ans == 'Y':
+                continue
+            else:
+                break
+        os.system('cls')
+        title()
+    
+    elif option == 5:
+        os.system('cls')
+        line_1 = "__________________________"
+        msg = "Thank you for using this software"
+        line_2 = "_______________________"
+
+        print(line_1.center(130))
+        print(msg.center(130))
+        print(line_2.center(130))
+        break
